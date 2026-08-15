@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Crib Rules">
+<meta name="theme-color" content="#F4EAD5">
+<title>Cribbage — Rules Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parchment:#F4EAD5;--wine:#6B2737;--wine-light:#8E3B4C;
+  --gold:#B8912F;--gold-light:#D9B75A;--ink:#2C2118;--ink-soft:#6A5A48;
+  --board:#8A5A34;--board-dark:#5E3B20;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--parchment);
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(217,183,90,.16),transparent 55%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:18px;line-height:1.5;
+  padding:env(safe-area-inset-top) 0 calc(2.5rem + env(safe-area-inset-bottom));
+  -webkit-text-size-adjust:100%;
+}
+header{text-align:center;padding:1.9rem 1.2rem 1.1rem}
+.eyebrow{font-family:'DM Sans',sans-serif;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:500}
+h1{font-family:'Italiana',serif;font-size:2.5rem;font-weight:400;margin:.15rem 0 .1rem;color:var(--wine)}
+.sub{margin:0;font-style:italic;color:var(--ink-soft);font-size:1rem}
+
+main{padding:0 .9rem;max-width:560px;margin:0 auto}
+
+/* accordion steps */
+details{
+  background:rgba(255,252,245,.8);
+  border:1px solid rgba(184,145,47,.32);
+  border-radius:6px;margin-bottom:.55rem;overflow:hidden;
+}
+details[open]{background:rgba(255,252,245,.95);border-color:rgba(184,145,47,.6)}
+summary{
+  list-style:none;cursor:pointer;
+  padding:.85rem 1rem;min-height:52px;
+  display:flex;align-items:center;gap:.75rem;
+}
+summary::-webkit-details-marker{display:none}
+.step-n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+  background:linear-gradient(160deg,var(--gold-light),var(--gold));
+  color:#2b2110;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 3px rgba(44,33,24,.3);
+}
+.step-t{
+  flex:1;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;
+  letter-spacing:.02em;color:var(--wine);
+}
+.chev{flex:0 0 auto;color:var(--gold);font-size:.85rem;transition:transform .22s}
+details[open] .chev{transform:rotate(90deg)}
+.body{padding:0 1rem 1rem;border-top:1px solid rgba(184,145,47,.22);margin-top:-1px;padding-top:.8rem}
+.body p{margin:.5rem 0}
+.body ul{margin:.5rem 0;padding-left:1.15rem}
+.body li{margin:.35rem 0}
+strong{color:var(--wine);font-weight:600}
+
+.note{
+  border-left:3px solid var(--gold);background:rgba(217,183,90,.15);
+  padding:.6rem .8rem;margin:.75rem 0;border-radius:0 4px 4px 0;font-size:.97rem;
+}
+.note b{display:block;font-family:'DM Sans',sans-serif;font-size:.58rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:.15rem}
+
+h2.band{
+  font-family:'DM Sans',sans-serif;font-size:.63rem;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--wine-light);font-weight:700;
+  margin:1.8rem 0 .7rem;padding-bottom:.4rem;
+  border-bottom:1px solid rgba(184,145,47,.4);
+}
+
+.plain{
+  background:rgba(255,252,245,.8);border:1px solid rgba(184,145,47,.32);
+  border-radius:6px;padding:.9rem 1rem;margin-bottom:.55rem;
+}
+.plain h3{font-family:'DM Sans',sans-serif;font-size:.78rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--wine);margin:0 0 .35rem;font-weight:700}
+.plain p{margin:.3rem 0;font-size:1rem}
+
+.vals{display:flex;justify-content:space-around;text-align:center;gap:.4rem;margin:.6rem 0 .2rem}
+.vals div{flex:1}
+.vals b{display:block;font-family:'DM Sans',sans-serif;font-size:1.35rem;color:var(--wine);line-height:1.2}
+.vals span{font-size:.82rem;color:var(--ink-soft);font-family:'DM Sans',sans-serif;letter-spacing:.05em}
+
+.link{
+  display:block;text-align:center;margin:1.6rem auto .4rem;
+  font-family:'DM Sans',sans-serif;font-size:.68rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-soft);
+}
+footer{text-align:center;padding:1.6rem 1rem .5rem;color:var(--ink-soft);font-style:italic;font-size:.92rem}
+footer .rule{width:44px;height:1px;background:var(--gold);margin:0 auto .8rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Two-Handed · Race to 121</div>
+  <h1>Cribbage</h1>
+  <p class="sub">How a hand goes</p>
+</header>
+
+<main>
+
+<h2 class="band">Order of a hand</h2>
+
+<details open>
+  <summary><span class="step-n">1</span><span class="step-t">Deal six cards each</span><span class="chev">›</span></summary>
+  <div class="body">
+    <p>Low cut deals the first hand; after that the deal alternates. Dealer gives six cards each, one at a time.</p>
+    <div class="note"><b>Three or four players</b>Five cards each instead. Three-handed, one extra card is dealt straight to the crib.</div>
+  </div>
+</details>
+
+<details>
+  <summary><span class="step-n">2</span><span class="step-t">Each player throws two to the crib</span><span class="chev">›</span></summary>
+  <div class="body">
+    <p>Keep four, push two face down toward the dealer. Those four cards are the <strong>crib</strong>, and only the dealer scores them.</p>
+    <p>Nobody looks at the crib until the end of the hand.</p>
+    <div class="note"><b>Throwing rule of thumb</b>Help your own crib. Starve your opponent's — spread-out ranks, and never a 5.</div>
+  </div>
+</details>
+
+<details>
+  <summary><span class="step-n">3</span><span class="step-t">Cut the starter</span><span class="chev">›</span></summary>
+  <div class="body">
+    <p>Non-dealer cuts; dealer turns up the top card of the bottom portion. It stays face up all hand and counts as a fifth card for both hands <em>and</em> the crib.</p>
+    <p>The starter is never played during the play phase.</p>
+    <div class="note"><b>His heels</b>If the starter is a Jack, the dealer pegs <strong>2</strong> immediately, before any card is played.</div>
+  </div>
+</details>
+
+<details>
+  <summary><span class="step-n">4</span><span class="step-t">The play — count aloud to 31</span><span class="chev">›</span></summary>
+  <div class="body">
+    <p>Non-dealer leads. Alternate cards face up, saying the running total out loud. Never exceed 31.</p>
+    <ul>
+      <li>Can't play without passing 31? Say <strong>"go."</strong></li>
+      <li>Opponent keeps playing while they can.</li>
+      <li>Last card laid pegs <strong>1</strong> — or <strong>2</strong> if it hit exactly 31.</li>
+      <li>Count resets to zero. Whoever <em>didn't</em> play last now leads.</li>
+      <li>Continue until both hands are empty.</li>
+    </ul>
+    <div class="note"><b>Scoring during play</b>See the Scoring Card. Face cards count 10; Ace counts 1.</div>
+  </div>
+</details>
+
+<details>
+  <summary><span class="step-n">5</span><span class="step-t">The show — count the hands</span><span class="chev">›</span></summary>
+  <div class="body">
+    <p>Pick your four cards back up and add the starter. Count in this order, and only this order:</p>
+    <ul>
+      <li><strong>Non-dealer's hand</strong></li>
+      <li><strong>Dealer's hand</strong></li>
+      <li><strong>The crib</strong> — dealer's points</li>
+    </ul>
+    <div class="note"><b>Why order matters</b>The instant someone reaches 121 the game stops. Non-dealer counting first can win a race by one hole.</div>
+  </div>
+</details>
+
+<details>
+  <summary><span class="step-n">6</span><span class="step-t">Pass the deal, repeat</span><span class="chev">›</span></summary>
+  <div class="body">
+    <p>Gather every card, shuffle, and the other player deals. Keep going until someone pegs out at 121.</p>
+    <p>Exact count isn't required — you win by reaching or passing 121.</p>
+  </div>
+</details>
+
+<h2 class="band">Card values</h2>
+
+<div class="plain">
+  <div class="vals">
+    <div><b>1</b><span>Ace</span></div>
+    <div><b>2–10</b><span>Face value</span></div>
+    <div><b>10</b><span>J · Q · K</span></div>
+  </div>
+  <p style="margin-top:.7rem;font-size:.96rem;color:var(--ink-soft)">For <strong>runs</strong>, the sequence is A‑2‑3‑4‑5‑6‑7‑8‑9‑10‑J‑Q‑K. Ace is always low; it never follows a King.</p>
+</div>
+
+<h2 class="band">Winning</h2>
+
+<div class="plain">
+  <h3>The finish</h3>
+  <p>First to <strong>121</strong> wins immediately. The hand stops mid-count — your opponent doesn't get to finish.</p>
+</div>
+
+<div class="plain">
+  <h3>Skunks</h3>
+  <p>Loser at <strong>90 or fewer</strong> is a skunk — counts as two games. Under <strong>61</strong> is a double skunk.</p>
+</div>
+
+<div class="plain">
+  <h3>Muggins · optional</h3>
+  <p>If you miss points in your own hand and your opponent catches it, they claim them. Agree before you start. Leave it off while learning.</p>
+</div>
+
+<h2 class="band">Etiquette that keeps you honest</h2>
+
+<div class="plain">
+  <p>Say the running total aloud on every card during the play. During the show, name each combination as you count it — "fifteen two, fifteen four, and a pair is six" — rather than announcing a total. It catches mistakes before they get pegged.</p>
+</div>
+
+</main>
+
+<footer>
+  <div class="rule"></div>
+  Deal · Crib · Starter · Play · Show
+</footer>
+
+</body>
+</html>

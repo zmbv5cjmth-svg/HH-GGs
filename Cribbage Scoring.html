@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Crib Scoring">
+<meta name="theme-color" content="#F4EAD5">
+<title>Cribbage — Scoring Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parchment:#F4EAD5;--wine:#6B2737;--wine-light:#8E3B4C;
+  --gold:#B8912F;--gold-light:#D9B75A;--ink:#2C2118;--ink-soft:#6A5A48;
+  --red:#9B2226;--felt:#2F4F3E;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--parchment);
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(217,183,90,.16),transparent 55%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:18px;line-height:1.45;
+  padding-bottom:calc(2.5rem + env(safe-area-inset-bottom));
+  -webkit-text-size-adjust:100%;
+}
+header{text-align:center;padding:calc(1.6rem + env(safe-area-inset-top)) 1.2rem .9rem}
+.eyebrow{font-family:'DM Sans',sans-serif;font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:500}
+h1{font-family:'Italiana',serif;font-size:2.4rem;font-weight:400;margin:.15rem 0 .05rem;color:var(--wine)}
+.sub{margin:0;font-style:italic;color:var(--ink-soft);font-size:1rem}
+
+/* sticky order strip */
+.order{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,#6B2737,#57202d);
+  color:#F2E6D2;padding:.55rem .8rem;text-align:center;
+  font-family:'DM Sans',sans-serif;font-size:.63rem;letter-spacing:.13em;
+  text-transform:uppercase;font-weight:500;
+  box-shadow:0 2px 8px rgba(44,33,24,.25);
+}
+.order b{color:var(--gold-light);font-weight:700}
+
+/* tabs */
+.tabs{
+  display:flex;gap:.35rem;max-width:560px;margin:1rem auto .8rem;padding:0 .9rem;
+}
+.tab{
+  flex:1;min-height:46px;
+  font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:500;
+  background:rgba(255,252,245,.7);color:var(--ink-soft);
+  border:1px solid rgba(184,145,47,.4);border-radius:4px;
+  cursor:pointer;transition:background .2s,color .2s;
+}
+.tab[aria-selected="true"]{background:var(--wine);color:#F2E6D2;border-color:var(--wine);font-weight:700}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+main{padding:0 .9rem;max-width:560px;margin:0 auto}
+.panel[hidden]{display:none}
+
+.row{
+  display:flex;align-items:flex-start;gap:.8rem;
+  background:rgba(255,252,245,.82);
+  border:1px solid rgba(184,145,47,.3);
+  border-radius:6px;padding:.75rem .9rem;margin-bottom:.5rem;
+}
+.pts{
+  flex:0 0 46px;text-align:center;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.5rem;
+  color:var(--wine);line-height:1.1;padding-top:.05rem;
+}
+.pts small{display:block;font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-top:.1rem}
+.what{flex:1}
+.what b{
+  display:block;font-family:'DM Sans',sans-serif;font-size:.82rem;
+  letter-spacing:.05em;color:var(--wine);font-weight:700;margin-bottom:.1rem;
+}
+.what span{display:block;font-size:.98rem;color:var(--ink-soft);line-height:1.4}
+
+h2.band{
+  font-family:'DM Sans',sans-serif;font-size:.62rem;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--wine-light);font-weight:700;
+  margin:1.6rem 0 .65rem;padding-bottom:.35rem;
+  border-bottom:1px solid rgba(184,145,47,.4);
+}
+h2.band:first-child{margin-top:.4rem}
+
+.note{
+  border-left:3px solid var(--gold);background:rgba(217,183,90,.16);
+  padding:.65rem .85rem;margin:.7rem 0;border-radius:0 4px 4px 0;font-size:.98rem;
+}
+.note b{display:block;font-family:'DM Sans',sans-serif;font-size:.57rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:.2rem}
+strong{color:var(--wine);font-weight:600}
+
+/* mini cards */
+.card{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  width:30px;height:42px;background:linear-gradient(170deg,#fffdf8,#f3ead8);
+  border:1px solid rgba(44,33,24,.28);border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-weight:700;line-height:1;
+  box-shadow:0 1px 3px rgba(44,33,24,.2);margin:1px;vertical-align:middle;color:var(--ink);
+}
+.card .r{font-size:.78rem}.card .s{font-size:.72rem;margin-top:1px}
+.card.red{color:var(--red)}
+.ex{display:flex;align-items:center;gap:.1rem;flex-wrap:wrap;margin:.45rem 0 .1rem}
+.ex .eq{font-family:'DM Sans',sans-serif;font-size:.75rem;color:var(--ink-soft);margin-left:.5rem;letter-spacing:.03em}
+
+.example{
+  background:rgba(47,79,62,.07);border:1px solid rgba(47,79,62,.22);
+  border-radius:6px;padding:.8rem .9rem;margin-bottom:.5rem;
+}
+.example h3{font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--felt);margin:0 0 .2rem;font-weight:700}
+.example .tally{font-size:.98rem;color:var(--ink-soft);margin:.35rem 0 0}
+.example .tally b{color:var(--wine);font-weight:600}
+
+.fifteens{
+  background:rgba(255,252,245,.82);border:1px solid rgba(184,145,47,.3);
+  border-radius:6px;padding:.85rem .9rem;
+}
+.fifteens table{width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:.86rem}
+.fifteens td{padding:.32rem .2rem;border-bottom:1px solid rgba(184,145,47,.18);color:var(--ink-soft)}
+.fifteens td:first-child{font-weight:700;color:var(--wine);white-space:nowrap;width:78px}
+.fifteens tr:last-child td{border-bottom:none}
+
+footer{text-align:center;padding:1.8rem 1rem .5rem;color:var(--ink-soft);font-style:italic;font-size:.92rem}
+footer .rule{width:44px;height:1px;background:var(--gold);margin:0 auto .8rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Quick Reference</div>
+  <h1>Scoring</h1>
+  <p class="sub">Cribbage</p>
+</header>
+
+<div class="order">Count in order: <b>15s → Pairs → Runs → Flush → Nobs</b></div>
+
+<div class="tabs" role="tablist">
+  <button class="tab" id="tab-show" role="tab" aria-selected="true" aria-controls="p-show">The Show</button>
+  <button class="tab" id="tab-play" role="tab" aria-selected="false" aria-controls="p-play">The Play</button>
+</div>
+
+<main>
+
+<!-- ===== SHOW ===== -->
+<div class="panel" id="p-show" role="tabpanel" aria-labelledby="tab-show">
+
+  <h2 class="band">Your four cards plus the starter</h2>
+
+  <div class="row">
+    <div class="pts">2<small>each</small></div>
+    <div class="what"><b>Fifteen</b><span>Any set of cards adding to exactly 15. Count every distinct combination — two cards, three, four, or all five.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">2<small>each</small></div>
+    <div class="what"><b>Pair</b><span>Two cards of the same rank. Three of a kind is 6. Four of a kind is 12.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">3+<small>per card</small></div>
+    <div class="what"><b>Run</b><span>Three or more cards in sequence, any suits. 1 point per card. A duplicated rank makes the whole run count again.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">4<small>or 5</small></div>
+    <div class="what"><b>Flush</b><span>All four cards in hand the same suit is 4. If the starter matches too, 5. In the crib, only a five-card flush counts.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">1</div>
+    <div class="what"><b>Nobs</b><span>You hold the Jack matching the starter's suit. Say "one for his nob."</span></div>
+  </div>
+
+  <h2 class="band">Fifteens worth memorizing</h2>
+  <div class="fifteens">
+    <table>
+      <tr><td>5 + 10</td><td>Any five with a 10, J, Q, or K</td></tr>
+      <tr><td>7 + 8</td><td>and 6 + 9 — the two-card pairs</td></tr>
+      <tr><td>A + 4 + 10</td><td>and A + 5 + 9, A + 6 + 8</td></tr>
+      <tr><td>2 + 3 + 10</td><td>and 2 + 4 + 9, 2 + 6 + 7</td></tr>
+      <tr><td>3 + 4 + 8</td><td>and 3 + 5 + 7, 4 + 5 + 6</td></tr>
+      <tr><td>5 + 5 + 5</td><td>the reason fives are gold</td></tr>
+    </table>
+  </div>
+
+  <h2 class="band">The ones people miscount</h2>
+
+  <div class="example">
+    <h3>Double run</h3>
+    <div class="ex">
+      <span class="card red"><span class="r">4</span><span class="s">♥</span></span>
+      <span class="card"><span class="r">5</span><span class="s">♠</span></span>
+      <span class="card red"><span class="r">5</span><span class="s">♦</span></span>
+      <span class="card"><span class="r">6</span><span class="s">♣</span></span>
+      <span class="card"><span class="r">J</span><span class="s">♠</span></span>
+    </div>
+    <p class="tally">Each 5 makes its own 4‑5‑6, so that's <b>two runs of three = 6</b>. Pair of fives <b>2</b>. Fifteens: 4+5+6 twice <b>4</b>, 5+J twice <b>4</b>. Total <b>16</b>.</p>
+  </div>
+
+  <div class="example">
+    <h3>Three of a kind in a run</h3>
+    <div class="ex">
+      <span class="card"><span class="r">6</span><span class="s">♠</span></span>
+      <span class="card red"><span class="r">7</span><span class="s">♥</span></span>
+      <span class="card red"><span class="r">7</span><span class="s">♦</span></span>
+      <span class="card"><span class="r">7</span><span class="s">♣</span></span>
+      <span class="card"><span class="r">8</span><span class="s">♠</span></span>
+    </div>
+    <p class="tally">Three separate 6‑7‑8 runs = <b>9</b>. Three of a kind <b>6</b>. Fifteens: 7+8 three times <b>6</b>. Total <b>21</b>.</p>
+  </div>
+
+  <div class="note">
+    <b>Don't memorize totals</b>Walk the five categories in order every single time. Fifteens, pairs, runs, flush, nobs. It's slower for a week and then it isn't.
+  </div>
+
+  <h2 class="band">Landmarks</h2>
+  <div class="row"><div class="pts">29</div><div class="what"><b>The perfect hand</b><span>Three fives plus the Jack, with the fourth five as starter.</span></div></div>
+  <div class="row"><div class="pts">19</div><div class="what"><b>Impossible</b><span>No five cards score 19. "A nineteen hand" means zero.</span></div></div>
+  <div class="row"><div class="pts">~8</div><div class="what"><b>Average</b><span>Anything over 12 is a good hand.</span></div></div>
+</div>
+
+<!-- ===== PLAY ===== -->
+<div class="panel" id="p-play" role="tabpanel" aria-labelledby="tab-play" hidden>
+
+  <h2 class="band">While laying cards toward 31</h2>
+
+  <div class="row">
+    <div class="pts">2</div>
+    <div class="what"><b>Fifteen</b><span>Your card brings the running total to exactly 15.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">2</div>
+    <div class="what"><b>Thirty-one</b><span>Your card brings the total to exactly 31. Count resets after.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">2</div>
+    <div class="what"><b>Pair</b><span>Your card matches the rank of the card just played.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">6</div>
+    <div class="what"><b>Pair royal</b><span>Third of the same rank in a row.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">12</div>
+    <div class="what"><b>Double pair royal</b><span>Fourth of the same rank in a row.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">3+<small>per card</small></div>
+    <div class="what"><b>Run</b><span>The last three or more cards played form a sequence when rearranged. Order played doesn't matter — but no duplicates among them.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">1</div>
+    <div class="what"><b>Go</b><span>Opponent can't play; you lay the last card of the round. If it made exactly 31, take 2 instead.</span></div>
+  </div>
+
+  <div class="row">
+    <div class="pts">1</div>
+    <div class="what"><b>Last card</b><span>You play the final card of the whole play phase.</span></div>
+  </div>
+
+  <div class="note">
+    <b>No flushes, no nobs</b>Flushes and nobs only score in the show. They never count during the play.
+  </div>
+
+  <h2 class="band">How runs build</h2>
+
+  <div class="example">
+    <h3>Order played doesn't matter</h3>
+    <div class="ex">
+      <span class="card"><span class="r">5</span><span class="s">♠</span></span>
+      <span class="card red"><span class="r">3</span><span class="s">♥</span></span>
+      <span class="card red"><span class="r">4</span><span class="s">♦</span></span>
+      <span class="ex eq">run of 3 → 3</span>
+    </div>
+    <p class="tally">3‑4‑5 rearranged is a sequence, so the player of the 4 pegs 3.</p>
+  </div>
+
+  <div class="example">
+    <h3>Runs keep extending</h3>
+    <div class="ex">
+      <span class="card"><span class="r">5</span><span class="s">♠</span></span>
+      <span class="card red"><span class="r">3</span><span class="s">♥</span></span>
+      <span class="card red"><span class="r">4</span><span class="s">♦</span></span>
+      <span class="card"><span class="r">2</span><span class="s">♣</span></span>
+      <span class="ex eq">run of 4 → 4</span>
+    </div>
+    <p class="tally">The next player extends it and takes the whole longer run.</p>
+  </div>
+
+  <div class="example">
+    <h3>A duplicate breaks it</h3>
+    <div class="ex">
+      <span class="card"><span class="r">5</span><span class="s">♠</span></span>
+      <span class="card red"><span class="r">3</span><span class="s">♥</span></span>
+      <span class="card red"><span class="r">3</span><span class="s">♦</span></span>
+      <span class="card"><span class="r">4</span><span class="s">♣</span></span>
+      <span class="ex eq">no run</span>
+    </div>
+    <p class="tally">The second 3 is a pair for 2. After it, no run can include both threes, so the 4 scores nothing.</p>
+  </div>
+
+  <h2 class="band">The go, precisely</h2>
+  <div class="row" style="display:block">
+    <div class="what" style="font-family:'Cormorant Garamond',serif">
+      <span style="font-size:1rem;color:var(--ink)">
+        Say <strong>"go"</strong> when no card in your hand fits under 31. Your opponent keeps laying cards as long as they can — scoring pairs, runs, and fifteens normally. When neither of you can play, the last player to lay a card pegs <strong>1</strong> (or <strong>2</strong> for hitting 31 exactly). Then the count resets to zero and the player who <em>did not</em> lay the last card leads the next round.
+      </span>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="rule"></div>
+  15s · Pairs · Runs · Flush · Nobs
+</footer>
+
+<script>
+(function(){
+  var tabs = [document.getElementById('tab-show'), document.getElementById('tab-play')];
+  var panels = [document.getElementById('p-show'), document.getElementById('p-play')];
+  function select(i){
+    tabs.forEach(function(t,n){ t.setAttribute('aria-selected', n === i ? 'true' : 'false'); });
+    panels.forEach(function(p,n){ p.hidden = n !== i; });
+    window.scrollTo({top:0, behavior:'instant' in window ? 'auto' : 'auto'});
+  }
+  tabs.forEach(function(t,i){ t.addEventListener('click', function(){ select(i); }); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cribbage">
+<title>Cribbage — A Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parchment:#F4EAD5;
+  --parchment-deep:#E8D9BC;
+  --wine:#6B2737;
+  --wine-light:#8E3B4C;
+  --gold:#B8912F;
+  --gold-light:#D9B75A;
+  --ink:#2C2118;
+  --ink-soft:#6A5A48;
+  --board:#8A5A34;
+  --board-dark:#5E3B20;
+  --red:#9B2226;
+  --shadow:rgba(44,33,24,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--parchment);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(217,183,90,.13), transparent 60%),
+    radial-gradient(ellipse at 85% 100%, rgba(107,39,55,.09), transparent 55%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:19px;
+  line-height:1.6;
+  padding-bottom:5rem;
+}
+
+/* ---------- Masthead ---------- */
+header{
+  text-align:center;
+  padding:2.6rem 1.5rem 1.2rem;
+  max-width:1100px;margin:0 auto;
+}
+.eyebrow{
+  font-family:'DM Sans',sans-serif;
+  font-size:.68rem;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--gold);font-weight:500;
+}
+h1{
+  font-family:'Italiana',serif;
+  font-size:clamp(2.8rem,7vw,4.6rem);
+  margin:.3rem 0 .1rem;font-weight:400;letter-spacing:.02em;
+  color:var(--wine);
+}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.15rem;margin:0}
+
+/* ---------- Peg-track navigation (signature) ---------- */
+.track-wrap{
+  max-width:1100px;margin:1.8rem auto 2.4rem;padding:0 1.2rem;
+}
+.track{
+  position:relative;
+  background:linear-gradient(180deg,var(--board) 0%,var(--board-dark) 100%);
+  border-radius:14px;
+  padding:.9rem .9rem .55rem;
+  box-shadow:0 6px 18px var(--shadow),inset 0 1px 0 rgba(255,255,255,.18);
+  display:flex;justify-content:space-between;gap:.3rem;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.stop{
+  flex:1 1 0;min-width:96px;
+  background:none;border:0;padding:.2rem .2rem .35rem;
+  cursor:pointer;text-align:center;
+  font-family:'DM Sans',sans-serif;
+  color:rgba(255,255,255,.62);
+  transition:color .25s;
+}
+.stop:hover,.stop:focus-visible{color:#fff;outline:none}
+.holes{display:flex;justify-content:center;gap:5px;margin-bottom:.45rem}
+.hole{
+  width:9px;height:9px;border-radius:50%;
+  background:rgba(0,0,0,.42);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.12);
+}
+.stop.active .hole:last-child,.stop.done .hole:last-child{
+  background:radial-gradient(circle at 35% 30%,var(--gold-light),var(--gold) 60%,#7d6018);
+  box-shadow:0 0 0 1px rgba(0,0,0,.35),0 2px 4px rgba(0,0,0,.45);
+}
+.stop.active{color:#fff}
+.stop.active .stop-label{color:var(--gold-light)}
+.stop-num{font-size:.6rem;letter-spacing:.2em;display:block;opacity:.7}
+.stop-label{font-size:.78rem;font-weight:500;letter-spacing:.03em;display:block;line-height:1.25}
+
+/* ---------- Sections ---------- */
+main{max-width:1100px;margin:0 auto;padding:0 1.4rem}
+section{
+  background:rgba(255,252,245,.72);
+  border:1px solid rgba(184,145,47,.3);
+  border-radius:6px;
+  padding:2rem 2.2rem;
+  margin-bottom:1.6rem;
+  scroll-margin-top:1rem;
+  box-shadow:0 2px 10px rgba(44,33,24,.06);
+}
+.sec-head{display:flex;align-items:baseline;gap:.9rem;border-bottom:1px solid rgba(184,145,47,.35);padding-bottom:.7rem;margin-bottom:1.3rem}
+.sec-num{
+  font-family:'DM Sans',sans-serif;font-size:.66rem;letter-spacing:.24em;
+  color:var(--gold);font-weight:700;padding-top:.4rem;white-space:nowrap;
+}
+h2{font-family:'Italiana',serif;font-size:2.1rem;font-weight:400;margin:0;color:var(--wine);letter-spacing:.01em}
+h3{font-family:'DM Sans',sans-serif;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--wine-light);margin:1.7rem 0 .6rem;font-weight:700}
+p{margin:.7rem 0}
+strong{color:var(--wine);font-weight:600}
+ul,ol{padding-left:1.3rem;margin:.6rem 0}
+li{margin:.42rem 0}
+
+.lede{font-size:1.22rem;line-height:1.55;color:var(--ink-soft);font-style:italic;margin-bottom:1.2rem}
+
+.callout{
+  border-left:3px solid var(--gold);
+  background:rgba(217,183,90,.13);
+  padding:.85rem 1.1rem;margin:1.2rem 0;border-radius:0 4px 4px 0;
+}
+.callout .tag{
+  display:block;font-family:'DM Sans',sans-serif;font-size:.62rem;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.25rem;
+}
+
+/* ---------- Cards ---------- */
+.card{
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  width:46px;height:64px;
+  background:linear-gradient(170deg,#fffdf8,#f3ead8);
+  border:1px solid rgba(44,33,24,.28);
+  border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-weight:700;
+  box-shadow:0 2px 5px rgba(44,33,24,.2);
+  vertical-align:middle;margin:2px;
+  line-height:1;color:var(--ink);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.card .r{font-size:1.15rem}
+.card .s{font-size:1.05rem;margin-top:2px}
+.card.red{color:var(--red)}
+.card.sm{width:34px;height:48px}
+.card.sm .r{font-size:.85rem}.card.sm .s{font-size:.8rem}
+.card.starter{border:2px solid var(--gold);box-shadow:0 0 0 3px rgba(217,183,90,.28),0 2px 6px rgba(44,33,24,.25)}
+.card.ghost{opacity:.24;filter:grayscale(1)}
+.card.just{transform:translateY(-8px);box-shadow:0 8px 14px rgba(44,33,24,.3)}
+.hand{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:.5rem 0}
+
+/* ---------- Play demo ---------- */
+.demo{
+  background:linear-gradient(180deg,#2F4F3E,#223B2E);
+  border-radius:10px;padding:1.3rem 1.3rem 1.1rem;
+  color:#EBE3D2;margin:1.2rem 0;
+  box-shadow:inset 0 2px 12px rgba(0,0,0,.35);
+}
+.demo h4{font-family:'DM Sans',sans-serif;font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(235,227,210,.55);margin:0 0 .5rem;font-weight:500}
+.demo-row{margin-bottom:.9rem}
+.demo-row .who{font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-light);font-weight:500}
+.tableau{
+  display:flex;flex-wrap:wrap;gap:3px;min-height:70px;align-items:center;
+  border-top:1px solid rgba(235,227,210,.16);
+  border-bottom:1px solid rgba(235,227,210,.16);
+  padding:.7rem 0;margin:.6rem 0;
+}
+.count-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.count{
+  font-family:'DM Sans',sans-serif;font-weight:700;
+  font-size:2.3rem;color:#fff;line-height:1;
+}
+.count small{display:block;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;font-weight:500;color:rgba(235,227,210,.5);margin-bottom:.15rem}
+.pegs{display:flex;gap:1.4rem}
+.peg-score{font-family:'DM Sans',sans-serif;text-align:center}
+.peg-score b{display:block;font-size:1.5rem;color:var(--gold-light);line-height:1.1}
+.peg-score span{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(235,227,210,.5)}
+.narration{
+  font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-style:italic;
+  min-height:3.4em;color:#F1EADA;margin:.8rem 0 .9rem;line-height:1.45;
+}
+.narration em{font-style:normal;color:var(--gold-light);font-weight:600}
+.demo-ctrl{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+button.ctrl{
+  font-family:'DM Sans',sans-serif;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;
+  background:rgba(235,227,210,.1);color:#EBE3D2;
+  border:1px solid rgba(235,227,210,.35);
+  padding:.6rem 1.3rem;border-radius:3px;cursor:pointer;
+  transition:background .2s,border-color .2s;
+  min-height:44px;
+}
+button.ctrl:hover,button.ctrl:focus-visible{background:rgba(235,227,210,.22);border-color:var(--gold-light);outline:none}
+button.ctrl.primary{background:var(--gold);color:#231a10;border-color:var(--gold);font-weight:700}
+button.ctrl.primary:hover{background:var(--gold-light)}
+button.ctrl:disabled{opacity:.35;cursor:default}
+.step-of{font-family:'DM Sans',sans-serif;font-size:.68rem;letter-spacing:.16em;color:rgba(235,227,210,.5);margin-left:auto}
+
+/* ---------- Score table ---------- */
+table{width:100%;border-collapse:collapse;margin:.9rem 0;font-size:1rem}
+th{
+  font-family:'DM Sans',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);text-align:left;font-weight:700;
+  border-bottom:1px solid rgba(184,145,47,.4);padding:.5rem .6rem;
+}
+td{padding:.55rem .6rem;border-bottom:1px solid rgba(184,145,47,.18);vertical-align:top}
+td.pts{font-family:'DM Sans',sans-serif;font-weight:700;color:var(--wine);text-align:right;white-space:nowrap}
+tr.total td{border-bottom:none;border-top:2px solid var(--wine);font-weight:600;padding-top:.7rem}
+tr.total td.pts{font-size:1.2rem}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
+@media (max-width:820px){.grid2{grid-template-columns:1fr;gap:1rem}}
+
+footer{text-align:center;padding:2.5rem 1rem 1rem;color:var(--ink-soft);font-style:italic;font-size:.95rem}
+footer .rule{width:60px;height:1px;background:var(--gold);margin:0 auto 1rem}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:700px){
+  body{font-size:17px}
+  section{padding:1.4rem 1.2rem}
+  h2{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Six Cards · Two Players · One Hundred Twenty-One</div>
+  <h1>Cribbage</h1>
+  <p class="subtitle">A walkthrough for Drew &amp; Karrie</p>
+</header>
+
+<div class="track-wrap">
+  <nav class="track" id="track" aria-label="Sections">
+    <button class="stop active" data-go="s1"><span class="holes"><i class="hole"></i><i class="hole"></i><i class="hole"></i></span><span class="stop-num">I</span><span class="stop-label">The Object</span></button>
+    <button class="stop" data-go="s2"><span class="holes"><i class="hole"></i><i class="hole"></i><i class="hole"></i></span><span class="stop-num">II</span><span class="stop-label">Deal &amp; Crib</span></button>
+    <button class="stop" data-go="s3"><span class="holes"><i class="hole"></i><i class="hole"></i><i class="hole"></i></span><span class="stop-num">III</span><span class="stop-label">The Starter</span></button>
+    <button class="stop" data-go="s4"><span class="holes"><i class="hole"></i><i class="hole"></i><i class="hole"></i></span><span class="stop-num">IV</span><span class="stop-label">The Play</span></button>
+    <button class="stop" data-go="s5"><span class="holes"><i class="hole"></i><i class="hole"></i><i class="hole"></i></span><span class="stop-num">V</span><span class="stop-label">The Show</span></button>
+    <button class="stop" data-go="s6"><span class="holes"><i class="hole"></i><i class="hole"></i><i class="hole"></i></span><span class="stop-num">VI</span><span class="stop-label">Winning</span></button>
+  </nav>
+</div>
+
+<main>
+
+<!-- ============ 1 ============ -->
+<section id="s1">
+  <div class="sec-head"><span class="sec-num">I</span><h2>The Object</h2></div>
+  <p class="lede">Race your opponent to 121 points. You score in two ways every hand: during the play, and after it.</p>
+
+  <p>Cribbage is really one small idea repeated: <strong>find combinations of cards worth points</strong>. Cards that add to fifteen. Cards that match. Cards in sequence. That's almost the whole game.</p>
+
+  <p>The board isn't part of the rules — it's just a running tally. Two pegs each, leapfrogging up a track of 121 holes. The rear peg marks where you were, the front peg where you are, so nobody can lose track of the count.</p>
+
+  <h3>What cards are worth</h3>
+  <ul>
+    <li><strong>Ace</strong> counts as 1. Always low — it never wraps around to follow a King.</li>
+    <li><strong>2 through 10</strong> count as their face value.</li>
+    <li><strong>Jack, Queen, King</strong> each count as 10 when you're adding.</li>
+  </ul>
+  <p>For <em>runs</em>, order matters differently: the sequence is A‑2‑3‑4‑5‑6‑7‑8‑9‑10‑J‑Q‑K. So J‑Q‑K is a run of three, even though all three count as 10 for adding.</p>
+
+  <h3>The shape of a hand</h3>
+  <ol>
+    <li>Deal six cards each.</li>
+    <li>Each player throws two away into the <strong>crib</strong> — a fifth hand that belongs to the dealer.</li>
+    <li>Cut a <strong>starter</strong> card. It gets used by everybody.</li>
+    <li><strong>The play:</strong> alternate cards face up, counting aloud toward 31. Score as you go.</li>
+    <li><strong>The show:</strong> pick your cards back up and count what they're worth. Non-dealer first, then dealer, then the crib.</li>
+    <li>Deal passes to the other player. Repeat.</li>
+  </ol>
+
+  <div class="callout">
+    <span class="tag">Why the crib matters</span>
+    The crib is a fifth hand that only the dealer scores. That's a real edge — which is why the deal alternates every hand, and why deciding what to throw away is the first genuine decision in the game.
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="s2">
+  <div class="sec-head"><span class="sec-num">II</span><h2>The Deal &amp; The Crib</h2></div>
+  <p class="lede">Six cards each. Keep four, throw two. The two you throw go to the dealer.</p>
+
+  <h3>Who deals first</h3>
+  <p>Cut the deck. <strong>Low card deals.</strong> Ace is low. If you tie, cut again. After the first hand, the deal simply alternates.</p>
+
+  <h3>The deal</h3>
+  <p>Dealer gives six cards each, one at a time, alternating. The rest of the deck sits face down between you.</p>
+
+  <h3>Throwing to the crib</h3>
+  <p>Both players choose two cards from their six and push them face down toward the dealer. Those four cards are the crib. Nobody looks at it until the very end of the hand.</p>
+
+  <p>Say Karrie is dealt these:</p>
+  <div class="hand">
+    <span class="card red"><span class="r">2</span><span class="s">♦</span></span>
+    <span class="card"><span class="r">3</span><span class="s">♠</span></span>
+    <span class="card red"><span class="r">4</span><span class="s">♣</span>&nbsp;</span>
+    <span class="card red"><span class="r">7</span><span class="s">♥</span></span>
+    <span class="card"><span class="r">8</span><span class="s">♣</span></span>
+    <span class="card red"><span class="r">Q</span><span class="s">♥</span></span>
+  </div>
+  <p>She keeps <strong>2♦ 3♠ 7♥ 8♣</strong> — the 7 and 8 make fifteen together, and 2‑3 could grow into a run if the starter cooperates. She throws <strong>4♣</strong> and <strong>Q♥</strong>.</p>
+
+  <div class="callout">
+    <span class="tag">The one rule of thumb worth learning first</span>
+    When it's <em>your</em> crib, throw cards that might help it. When it's <em>your opponent's</em> crib, throw junk — cards far apart in rank, and never a 5. Fives are the most valuable card in the deck, because every ten-card in the deck pairs with one to make fifteen.
+  </div>
+
+  <h3>Three or four players</h3>
+  <p>Three players get five cards each and throw one apiece, plus one dealt straight from the deck to fill the crib. Four players play as two partnerships, five cards each, one card apiece to the crib. Start with two-handed — it's the real game.</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="s3">
+  <div class="sec-head"><span class="sec-num">III</span><h2>The Starter</h2></div>
+  <p class="lede">One shared card that belongs to every hand at the table.</p>
+
+  <p>Once the crib is set, the non-dealer cuts the deck and the dealer turns up the top card of the bottom portion. That's the starter, and it stays face up for the whole hand.</p>
+
+  <p>The starter counts as a fifth card for <em>everyone</em> — your hand, your opponent's hand, and the crib. It's never played during the play phase; it just sits there making combinations.</p>
+
+  <div class="hand" style="align-items:center;gap:.8rem">
+    <span class="card"><span class="r">2</span><span class="s">♦</span></span>
+    <span class="card"><span class="r">3</span><span class="s">♠</span></span>
+    <span class="card red"><span class="r">7</span><span class="s">♥</span></span>
+    <span class="card"><span class="r">8</span><span class="s">♣</span></span>
+    <span style="font-family:'DM Sans',sans-serif;font-size:.7rem;letter-spacing:.16em;color:var(--ink-soft);padding:0 .5rem">PLUS STARTER</span>
+    <span class="card red starter"><span class="r">9</span><span class="s">♦</span></span>
+  </div>
+  <p>Karrie's 7‑8 was already worth a fifteen. The 9♦ starter just turned it into a run of three as well.</p>
+
+  <div class="callout">
+    <span class="tag">His Heels</span>
+    If the starter is a <strong>Jack</strong>, the dealer immediately pegs <strong>2 points</strong>. Say "two for his heels." Peg it right away, before any cards are played — it's easy to forget and can't be claimed later.
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="s4">
+  <div class="sec-head"><span class="sec-num">IV</span><h2>The Play</h2></div>
+  <p class="lede">Alternate cards face up, calling the running total aloud. Never go past 31.</p>
+
+  <p>The non-dealer leads. Play alternates. Each card you lay down adds to a running total that you say out loud — "eight," "twelve," "fifteen for two." When nobody can play without exceeding 31, the count resets to zero and you keep going with whatever cards are left.</p>
+
+  <h3>What scores during the play</h3>
+  <table>
+    <tr><th>You do this</th><th style="text-align:right">Points</th></tr>
+    <tr><td>Bring the total to exactly <strong>15</strong></td><td class="pts">2</td></tr>
+    <tr><td>Bring the total to exactly <strong>31</strong></td><td class="pts">2</td></tr>
+    <tr><td>Match the rank of the card just played (<strong>pair</strong>)</td><td class="pts">2</td></tr>
+    <tr><td>Third of a rank in a row (<strong>pair royal</strong>)</td><td class="pts">6</td></tr>
+    <tr><td>Fourth of a rank in a row (<strong>double pair royal</strong>)</td><td class="pts">12</td></tr>
+    <tr><td>Complete a <strong>run</strong> with the last 3 or more cards played</td><td class="pts">1 per card</td></tr>
+    <tr><td>Play the last card when your opponent calls <strong>go</strong></td><td class="pts">1</td></tr>
+    <tr><td>Play the final card of the whole play phase</td><td class="pts">1</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="tag">Runs during the play</span>
+    The cards don't have to arrive in order — <strong>5, 3, 4</strong> is a run of three. What matters is that the last few cards played, rearranged, form an unbroken sequence with no duplicates among them. And runs keep growing: if the next card extends the sequence, that player scores the whole longer run.
+  </div>
+
+  <div class="callout">
+    <span class="tag">Go</span>
+    If you can't play without passing 31, say <strong>"go."</strong> Your opponent keeps laying cards down as long as they can. When neither of you can play, whoever laid the last card pegs <strong>1</strong> — unless they hit exactly 31, which is worth 2 instead. Then the count resets to zero and the player who <em>didn't</em> play last leads the next round.
+  </div>
+
+  <h3>Step through a real hand</h3>
+  <p>Karrie is the non-dealer, so she leads. Drew deals, so he gets the crib.</p>
+
+  <div class="demo">
+    <div class="demo-row">
+      <span class="who">Karrie · non-dealer</span>
+      <div class="hand" id="kHand"></div>
+    </div>
+    <div class="demo-row">
+      <span class="who">Drew · dealer</span>
+      <div class="hand" id="dHand"></div>
+    </div>
+
+    <h4>On the table</h4>
+    <div class="tableau" id="tableau"></div>
+
+    <div class="count-bar">
+      <div class="count"><small>Count</small><span id="countVal">0</span></div>
+      <div class="pegs">
+        <div class="peg-score"><b id="kPeg">0</b><span>Karrie</span></div>
+        <div class="peg-score"><b id="dPeg">0</b><span>Drew</span></div>
+      </div>
+    </div>
+
+    <p class="narration" id="narration">Karrie leads first. Tap <em>Next card</em> to begin.</p>
+
+    <div class="demo-ctrl">
+      <button class="ctrl" id="backBtn" disabled>Back</button>
+      <button class="ctrl primary" id="nextBtn">Next card</button>
+      <button class="ctrl" id="resetBtn">Restart</button>
+      <span class="step-of" id="stepOf">0 / 11</span>
+    </div>
+  </div>
+
+  <p>Notice what happened in the middle there: one run kept getting extended, and each player scored the whole thing on their turn. That back-and-forth is where pegging games are won.</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="s5">
+  <div class="sec-head"><span class="sec-num">V</span><h2>The Show</h2></div>
+  <p class="lede">Pick your four cards back up, add the starter, and count what you're holding.</p>
+
+  <p>Counting order matters, because the first player to reach 121 wins immediately — the hand stops there. The order is always: <strong>non-dealer, then dealer's hand, then the crib.</strong> Being non-dealer means you count first in a close game. Being dealer means you count twice.</p>
+
+  <h3>What scores in a hand</h3>
+  <table>
+    <tr><th>Combination</th><th style="text-align:right">Points</th></tr>
+    <tr><td><strong>Fifteen</strong> — any set of cards adding to exactly 15. Count every distinct set.</td><td class="pts">2</td></tr>
+    <tr><td><strong>Pair</strong> — two cards of the same rank. Three of a kind contains three pairs (6), four of a kind contains six (12).</td><td class="pts">2</td></tr>
+    <tr><td><strong>Run</strong> — three or more in sequence. A duplicate rank makes the run count twice.</td><td class="pts">1 per card</td></tr>
+    <tr><td><strong>Flush</strong> — all four cards in hand the same suit. If the starter matches too, 5.</td><td class="pts">4</td></tr>
+    <tr><td><strong>Nobs</strong> — you hold the Jack matching the starter's suit. Say "one for his nob."</td><td class="pts">1</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="tag">The one that trips people up</span>
+    A <strong>double run</strong>: 4‑5‑5‑6 is two separate runs of three (each 5 makes its own), so 6 points for runs — plus 2 for the pair of fives, plus any fifteens. Don't try to memorize the combined totals. Count fifteens, then pairs, then runs, then flush, then nobs. Every time, in that order.
+  </div>
+
+  <h3>Scoring the hand you just played</h3>
+  <p>Starter was the <span style="white-space:nowrap"><span class="card sm red starter"><span class="r">9</span><span class="s">♦</span></span></span></p>
+
+  <div class="grid2">
+    <div>
+      <h3 style="margin-top:.8rem">Karrie's hand</h3>
+      <div class="hand">
+        <span class="card sm red"><span class="r">2</span><span class="s">♦</span></span>
+        <span class="card sm"><span class="r">3</span><span class="s">♠</span></span>
+        <span class="card sm red"><span class="r">7</span><span class="s">♥</span></span>
+        <span class="card sm"><span class="r">8</span><span class="s">♣</span></span>
+        <span class="card sm red starter"><span class="r">9</span><span class="s">♦</span></span>
+      </div>
+      <table>
+        <tr><td>7 + 8 = fifteen</td><td class="pts">2</td></tr>
+        <tr><td>7‑8‑9 run of three</td><td class="pts">3</td></tr>
+        <tr class="total"><td>Hand</td><td class="pts">5</td></tr>
+      </table>
+      <p style="font-size:.98rem;color:var(--ink-soft)">The 2 and 3 never found a partner. That happens.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:.8rem">Drew's hand</h3>
+      <div class="hand">
+        <span class="card sm red"><span class="r">4</span><span class="s">♦</span></span>
+        <span class="card sm"><span class="r">5</span><span class="s">♣</span></span>
+        <span class="card sm red"><span class="r">6</span><span class="s">♥</span></span>
+        <span class="card sm"><span class="r">K</span><span class="s">♠</span></span>
+        <span class="card sm red starter"><span class="r">9</span><span class="s">♦</span></span>
+      </div>
+      <table>
+        <tr><td>4 + 5 + 6 = fifteen</td><td class="pts">2</td></tr>
+        <tr><td>6 + 9 = fifteen</td><td class="pts">2</td></tr>
+        <tr><td>5 + K = fifteen</td><td class="pts">2</td></tr>
+        <tr><td>4‑5‑6 run of three</td><td class="pts">3</td></tr>
+        <tr class="total"><td>Hand</td><td class="pts">9</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>And the crib</h3>
+  <p>Karrie threw <strong>4♣</strong> and <strong>Q♥</strong>. Drew threw <strong>6♠</strong> and <strong>9♠</strong> — into his own crib, hoping they'd combine.</p>
+  <div class="hand">
+    <span class="card sm red"><span class="r">4</span><span class="s">♣</span>&nbsp;</span>
+    <span class="card sm red"><span class="r">Q</span><span class="s">♥</span></span>
+    <span class="card sm"><span class="r">6</span><span class="s">♠</span></span>
+    <span class="card sm"><span class="r">9</span><span class="s">♠</span></span>
+    <span class="card sm red starter"><span class="r">9</span><span class="s">♦</span></span>
+  </div>
+  <table style="max-width:520px">
+    <tr><td>6♠ + 9♠ = fifteen</td><td class="pts">2</td></tr>
+    <tr><td>6♠ + 9♦ = fifteen</td><td class="pts">2</td></tr>
+    <tr><td>Pair of nines</td><td class="pts">2</td></tr>
+    <tr class="total"><td>Crib</td><td class="pts">6</td></tr>
+  </table>
+
+  <h3>The hand, all told</h3>
+  <table style="max-width:640px">
+    <tr><th></th><th style="text-align:right">Karrie</th><th style="text-align:right">Drew</th></tr>
+    <tr><td>Pegged during the play</td><td class="pts">6</td><td class="pts">10</td></tr>
+    <tr><td>Hand</td><td class="pts">5</td><td class="pts">9</td></tr>
+    <tr><td>Crib</td><td class="pts">—</td><td class="pts">6</td></tr>
+    <tr class="total"><td>Total this hand</td><td class="pts">11</td><td class="pts">25</td></tr>
+  </table>
+  <p>That's a strong dealer's hand — and a good illustration of why the deal alternates.</p>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="s6">
+  <div class="sec-head"><span class="sec-num">VI</span><h2>Winning</h2></div>
+  <p class="lede">First to 121. The moment you get there, stop — the rest of the hand doesn't happen.</p>
+
+  <p>If you're at 118 and count out to 121 while showing your hand, the game ends immediately. Your opponent doesn't get to count. This is why counting order is a rule, not a courtesy.</p>
+
+  <h3>Skunks</h3>
+  <p>If the loser is still at <strong>90 or fewer</strong> when the winner finishes, that's a <strong>skunk</strong> — traditionally worth two games. Under <strong>61</strong> is a <strong>double skunk</strong>. Purely for bragging rights, which is the point.</p>
+
+  <h3>Two optional rules, agree before you start</h3>
+  <ul>
+    <li><strong>Muggins.</strong> If you miss points in your own hand and your opponent spots it, they claim the points. Brutal but traditional. Leave it off while you're learning.</li>
+    <li><strong>Counting aloud.</strong> Some players require you to announce each combination as you count it. It's good discipline — say "fifteen two, fifteen four, and a run of three is seven" rather than just naming a total.</li>
+  </ul>
+
+  <h3>Numbers worth knowing</h3>
+  <ul>
+    <li><strong>29</strong> is the highest hand possible: three fives and the Jack matching a fifth-five starter. People play a lifetime without seeing it.</li>
+    <li><strong>19</strong> is impossible — no combination of five cards scores 19. Players say "a nineteen hand" to mean zero.</li>
+    <li>An <strong>average</strong> hand runs around 8 points. Anything over 12 is a good hand.</li>
+  </ul>
+
+  <div class="callout">
+    <span class="tag">For your first few games</span>
+    Play with both hands face up until the counting feels automatic. Ignore strategy entirely — just get comfortable spotting fifteens, pairs, and runs. The tactics arrive on their own once the arithmetic stops taking effort.
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="rule"></div>
+  Count fifteens, then pairs, then runs, then flush, then nobs.
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- section nav ---------- */
+var stops = Array.prototype.slice.call(document.querySelectorAll('.stop'));
+stops.forEach(function(b){
+  b.addEventListener('click', function(){
+    var el = document.getElementById(b.dataset.go);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+var secs = ['s1','s2','s3','s4','s5','s6'].map(function(id){return document.getElementById(id);});
+function markActive(){
+  var best = 0, bestDist = Infinity;
+  secs.forEach(function(s,i){
+    var d = Math.abs(s.getBoundingClientRect().top - 90);
+    if(d < bestDist){bestDist = d; best = i;}
+  });
+  stops.forEach(function(b,i){
+    b.classList.toggle('active', i === best);
+    b.classList.toggle('done', i < best);
+  });
+}
+var ticking = false;
+window.addEventListener('scroll', function(){
+  if(ticking) return;
+  ticking = true;
+  window.requestAnimationFrame(function(){ markActive(); ticking = false; });
+}, {passive:true});
+markActive();
+
+/* ---------- play demo ---------- */
+var K = [
+  {r:'2',s:'♦',red:true},
+  {r:'3',s:'♠',red:false},
+  {r:'7',s:'♥',red:true},
+  {r:'8',s:'♣',red:false}
+];
+var D = [
+  {r:'4',s:'♦',red:true},
+  {r:'5',s:'♣',red:false},
+  {r:'6',s:'♥',red:true},
+  {r:'K',s:'♠',red:false}
+];
+
+// Each step: who plays (or 'go'), which index of their hand, resulting count, points, narration
+var STEPS = [
+  {who:'K', idx:3, count:8,  kp:0, dp:0,
+   text:'Karrie leads the <em>8♣</em> and says "eight." Nothing scores yet.'},
+  {who:'D', idx:0, count:12, kp:0, dp:0,
+   text:'Drew plays the <em>4♦</em> — "twelve." Still nothing.'},
+  {who:'K', idx:1, count:15, kp:2, dp:0,
+   text:'Karrie plays the <em>3♠</em> — "fifteen for two." She pegs 2.'},
+  {who:'D', idx:1, count:20, kp:0, dp:3,
+   text:'Drew plays the <em>5♣</em> — "twenty." The last three cards were 4, 3, 5 — that\'s a <em>run of three</em>. Drew pegs 3.'},
+  {who:'K', idx:0, count:22, kp:4, dp:0,
+   text:'Karrie plays the <em>2♦</em> — "twenty-two." Now the last four are 4, 3, 5, 2 — a <em>run of four</em>. Karrie pegs 4.'},
+  {who:'D', idx:2, count:28, kp:0, dp:5,
+   text:'Drew plays the <em>6♥</em> — "twenty-eight." The last five make a <em>run of five</em>. Drew pegs 5.'},
+  {who:'go', count:28, kp:0, dp:1,
+   text:'Karrie\'s 7♥ would make 35, so she says <em>"go."</em> Drew\'s King would make 38 — he can\'t play either. Drew pegs <em>1 for the go</em>.'},
+  {who:'reset', count:0, kp:0, dp:0,
+   text:'The count resets to zero. Drew played last, so <em>Karrie leads</em> the next round with whatever is left.'},
+  {who:'K', idx:2, count:7,  kp:0, dp:0,
+   text:'Karrie plays the <em>7♥</em> — "seven."'},
+  {who:'D', idx:3, count:17, kp:0, dp:0,
+   text:'Drew plays the <em>K♠</em> — "seventeen."'},
+  {who:'end', count:17, kp:0, dp:1,
+   text:'Both hands are empty. Drew laid the final card, so he pegs <em>1 for last card</em>. Play is over — now they count their hands.'}
+];
+
+var kHandEl = document.getElementById('kHand'),
+    dHandEl = document.getElementById('dHand'),
+    tabEl   = document.getElementById('tableau'),
+    countEl = document.getElementById('countVal'),
+    kPegEl  = document.getElementById('kPeg'),
+    dPegEl  = document.getElementById('dPeg'),
+    narrEl  = document.getElementById('narration'),
+    nextBtn = document.getElementById('nextBtn'),
+    backBtn = document.getElementById('backBtn'),
+    resetBtn= document.getElementById('resetBtn'),
+    stepOf  = document.getElementById('stepOf');
+
+var cursor = 0; // number of steps applied
+
+function cardHTML(c, cls){
+  return '<span class="card sm ' + (c.red ? 'red ' : '') + (cls || '') + '">' +
+         '<span class="r">' + c.r + '</span><span class="s">' + c.s + '</span></span>';
+}
+
+function render(){
+  var kPlayed = {}, dPlayed = {}, played = [];
+  var kScore = 0, dScore = 0, count = 0, lastPlayed = null;
+
+  for(var i = 0; i < cursor; i++){
+    var st = STEPS[i];
+    kScore += st.kp; dScore += st.dp;
+    count = st.count;
+    if(st.who === 'K'){ kPlayed[st.idx] = true; played.push({c:K[st.idx], owner:'K'}); lastPlayed = played.length-1; }
+    if(st.who === 'D'){ dPlayed[st.idx] = true; played.push({c:D[st.idx], owner:'D'}); lastPlayed = played.length-1; }
+    if(st.who === 'reset'){ played.push({divider:true}); lastPlayed = null; }
+  }
+
+  kHandEl.innerHTML = K.map(function(c,i){ return cardHTML(c, kPlayed[i] ? 'ghost' : ''); }).join('');
+  dHandEl.innerHTML = D.map(function(c,i){ return cardHTML(c, dPlayed[i] ? 'ghost' : ''); }).join('');
+
+  tabEl.innerHTML = played.length
+    ? played.map(function(p,i){
+        if(p.divider) return '<span style="width:2px;height:44px;background:rgba(217,183,90,.5);margin:0 .5rem;border-radius:2px" aria-hidden="true"></span>';
+        return cardHTML(p.c, i === lastPlayed ? 'just' : '');
+      }).join('')
+    : '<span style="font-family:\'Cormorant Garamond\',serif;font-style:italic;color:rgba(235,227,210,.4)">No cards played yet.</span>';
+
+  countEl.textContent = count;
+  kPegEl.textContent = kScore;
+  dPegEl.textContent = dScore;
+  narrEl.innerHTML = cursor === 0
+    ? 'Karrie leads first. Tap <em>Next card</em> to begin.'
+    : STEPS[cursor-1].text;
+
+  stepOf.textContent = cursor + ' / ' + STEPS.length;
+  backBtn.disabled = cursor === 0;
+  nextBtn.disabled = cursor === STEPS.length;
+  nextBtn.textContent = cursor === STEPS.length ? 'Play complete' : 'Next card';
+}
+
+nextBtn.addEventListener('click', function(){ if(cursor < STEPS.length){ cursor++; render(); }});
+backBtn.addEventListener('click', function(){ if(cursor > 0){ cursor--; render(); }});
+resetBtn.addEventListener('click', function(){ cursor = 0; render(); });
+render();
+
+})();
+</script>
+</body>
+</html>
